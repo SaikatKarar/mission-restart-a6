@@ -9,6 +9,16 @@ function handleMenu() {
 // Trending Products in home page
 
 const container = document.getElementById("trendingProducts");
+const spinner = document.getElementById("loadingSpinner");
+
+
+function showSpinner() {
+    spinner.classList.remove("hidden");
+}
+
+function hideSpinner() {
+    spinner.classList.add("hidden");
+}
 
 async function loadTrendingProducts() {
     try {
@@ -140,20 +150,40 @@ function createTab(category, active = false) {
 
 
 async function loadAllProducts() {
+    showSpinner();
+
     const res = await fetch("https://fakestoreapi.com/products");
     allProducts = await res.json();
 
     displayAllProducts(allProducts);
+
+    hideSpinner();
 }
 
+
+// function filterByCategory(category) {
+//     const filtered = allProducts.filter(
+//         p => p.category === category
+//     );
+
+//     displayAllProducts(filtered);
+// }
 
 function filterByCategory(category) {
-    const filtered = allProducts.filter(
-        p => p.category === category
-    );
 
-    displayAllProducts(filtered);
+    showSpinner();
+
+    setTimeout(() => {
+        const filtered = allProducts.filter(
+            p => p.category === category
+        );
+
+        displayAllProducts(filtered);
+        hideSpinner();
+
+    }, 200);
 }
+
 
 
 function displayAllProducts(products) {
