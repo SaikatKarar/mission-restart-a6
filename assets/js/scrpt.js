@@ -1,3 +1,4 @@
+// navbar
 function handleMenu() {
     const menu = document.getElementById("nav-dialog");
     menu.classList.toggle("translate-x-full");
@@ -18,7 +19,7 @@ async function loadTrendingProducts() {
             .sort((a, b) => b.rating.rate - a.rating.rate)
             .slice(0, 3);
 
-        displayProducts(topThree);
+        displayTrendingProducts(topThree);
 
     } catch (error) {
         console.log("Error:", error);
@@ -26,7 +27,7 @@ async function loadTrendingProducts() {
 }
 
 
-function displayProducts(products) {
+function displayTrendingProducts(products) {
 
     container.innerHTML = "";
 
@@ -90,4 +91,142 @@ function displayProducts(products) {
 }
 
 loadTrendingProducts();
+
+// Products Page
+
+const tabsContainer = document.getElementById("categoryTabs");
+const grid = document.getElementById("productsGrid");
+
+let allProducts = [];
+
+
+loadCategories();
+loadAllProducts();
+
+
+
+
+async function loadCategories() {
+    const res = await fetch("https://fakestoreapi.com/products/categories");
+    const categories = await res.json();
+
+    createTab("All", true);
+
+    categories.forEach(cat => createTab(cat));
+}
+
+
+function createTab(category, active = false) {
+    const btn = document.createElement("button");
+
+    btn.innerText = category;
+
+    btn.className = active
+        ? activeClass()
+        : normalClass();
+
+    btn.addEventListener("click", () => {
+        setActive(btn);
+
+        if (category === "All") {
+            displayAllProducts(allProducts);
+        } else {
+            filterByCategory(category);
+        }
+    });
+
+    tabsContainer.appendChild(btn);
+}
+
+
+async function loadAllProducts() {
+    const res = await fetch("https://fakestoreapi.com/products");
+    allProducts = await res.json();
+
+    displayAllProducts(allProducts);
+}
+
+
+function filterByCategory(category) {
+    const filtered = allProducts.filter(
+        p => p.category === category
+    );
+
+    displayAllProducts(filtered);
+}
+
+
+function displayAllProducts(products) {
+    grid.innerHTML = "";
+
+    products.forEach(product => {
+
+        const shortTitle =
+            product.title.length > 35
+                ? product.title.slice(0, 35) + "..."
+                : product.title;
+
+        const card = document.createElement("div");
+
+        card.className =
+            "bg-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden group";
+
+        card.innerHTML = `
+      <div class="bg-gray-200 p-8 flex justify-center overflow-hidden">
+        <img src="${product.image}"
+          class="h-50 object-contain group-hover:scale-110 transition duration-300" />
+      </div>
+
+      <div class="p-5 space-y-3 text-left">
+
+        <div class="flex justify-between items-center text-sm">
+          <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-xs font-medium">
+            ${product.category}
+          </span>
+
+          <span class="flex items-center gap-1 text-gray-400">
+             <i class="fa-solid fa-star text-yellow-500"></i> ${product.rating.rate}
+          </span>
+        </div>
+
+        <h3 class="font-semibold text-gray-800">${shortTitle}</h3>
+
+        <p class="text-xl font-bold text-gray-900">$${product.price}</p>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            class="flex-1 border rounded-lg py-2 text-gray-600 hover:bg-gray-50 cursor-pointer">
+            Details
+          </button>
+
+          <button
+            class="flex-1 bg-indigo-600 text-white rounded-lg py-2 hover:bg-indigo-700 cursor-pointer">
+            Add
+          </button>
+        </div>
+      </div>
+    `;
+
+        grid.appendChild(card);
+    });
+}
+
+
+function setActive(activeBtn) {
+    document.querySelectorAll("#categoryTabs button").forEach(btn => {
+        btn.className = normalClass();
+    });
+
+    activeBtn.className = activeClass();
+}
+
+
+function activeClass() {
+    return "px-6 py-2 rounded-full text-sm font-medium text-white bg-indigo-600 shadow-md cursor-pointer";
+}
+
+function normalClass() {
+    return "px-6 py-2 rounded-full text-sm font-medium border border-gray-300 text-gray-600 hover:bg-white hover:shadow cursor-pointer";
+}
+
 
