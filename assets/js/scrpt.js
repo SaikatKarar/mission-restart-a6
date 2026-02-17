@@ -461,5 +461,40 @@ function closeModalFunc() {
 
 closeModalBtn?.addEventListener("click", closeModalFunc);
 
+// ==========================================
+// ================ Newsletter ==============
+// ==========================================
 
+const emailInput = document.getElementById("newsletterEmail");
+const subscribeBtn = document.getElementById("subscribeBtn");
+const msg = document.getElementById("newsletterMsg");
+
+subscribeBtn.addEventListener("click", subscribeNewsletter);
+
+function subscribeNewsletter() {
+
+    const email = emailInput.value.trim();
+
+
+    if (email === "") {
+        msg.innerText = "Please enter email";
+        msg.className = "text-red-500 text-sm mt-2";
+        return;
+    }
+
+    if (!email.includes("@") || !email.includes(".")) {
+        msg.innerText = "Invalid email address";
+        msg.className = "text-red-500 text-sm mt-2";
+        return;
+    }
+
+    let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
+    subscribers.push(email);
+    localStorage.setItem("subscribers", JSON.stringify(subscribers));
+
+    msg.innerText = "Subscribed successfully ";
+    msg.className = "text-green-600 text-sm mt-2";
+
+    emailInput.value = "";
+}
 
